@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordki - Aplicación de escritorio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px 40px;
+      border-bottom: 1px solid #222;
+    }
+    header h1 {
+      font-size: 28px;
+      color: #4f8ef7;
+    }
+    .hero {
+      text-align: center;
+      padding: 80px 20px 40px;
+    }
+    .hero h2 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 20px;
+      color: #aaa;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .price {
+      font-size: 56px;
+      font-weight: bold;
+      color: #4f8ef7;
+      margin-bottom: 30px;
+    }
+    #paypal-button-container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 60px 20px;
+      flex-wrap: wrap;
+    }
+    .feature {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 250px;
+      text-align: center;
+    }
+    .feature h3 {
+      margin-bottom: 10px;
+      color: #4f8ef7;
+    }
+    .feature p {
+      color: #aaa;
+      font-size: 14px;
+    }
+    #success-message {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      background: #1a2a1a;
+      border-radius: 12px;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    #success-message h3 {
+      color: #4caf50;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    #download-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 15px 40px;
+      background: #4f8ef7;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Wordki</h1>
+  </header>
+
+  <div class="hero">
+    <h2>La herramienta que necesitas</h2>
+    <p>Descripción breve de lo que hace tu aplicación. Cambia este texto por el tuyo.</p>
+    <div class="price">$10 USD</div>
+    <div id="paypal-button-container"></div>
+    <div id="success-message">
+      <h3>¡Pago exitoso!</h3>
+      <p>Gracias por tu compra. Haz clic abajo para descargar Wordki.</p>
+      <a id="download-btn" href="#">Descargar Wordki</a>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Característica 1</h3>
+      <p>Describe aquí una función importante de tu app.</p>
+    </div>
+    <div class="feature">
+      <h3>Característica 2</h3>
+      <p>Describe aquí otra función importante de tu app.</p>
+    </div>
+    <div class="feature">
+      <h3>Característica 3</h3>
+      <p>Describe aquí otra función importante de tu app.</p>
+    </div>
+  </div>
+
+  <script src="https://www.paypal.com/sdk/js?client-id=ASYb5gHOLz_Z7WqVT564Ok0j4_bZx6aATC1fnMGXqPtZHEVbX6jM5txtVp3MQihVGoPCDGb3MsubE3FW"></script>
+  <script>
+    paypal.Buttons({
+      createOrder: async () => {
+        const res = await fetch('/create-order', { method: 'POST' });
+        const data = await res.json();
+        return data.id;
+      },
+      onApprove: async (data) => {
+        const res = await fetch('/capture-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderID: data.orderID })
+        });
+        const result = await res.json();
+        document.getElementById('paypal-button-container').style.display = 'none';
+        const successMsg = document.getElementById('success-message');
+        successMsg.style.display = 'block';
+        document.getElementById('download-btn').href = result.downloadLink;
+      }
+    }).render('#paypal-button-container');
+  </script>
+
+</body>
+</html> 
